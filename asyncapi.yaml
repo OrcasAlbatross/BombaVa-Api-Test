@@ -1,109 +1,157 @@
-asyncapi: 3.0.0
+asyncapi: 3.1.0
 info:
-  title: API Test
+  title: Chat Rooms API
   version: 1.0.0
-  description: Prueba de API en tiempo real para creacion de salas y envio de mensajes usando Socket.io.
+  description: |
+    Prueba de API en tiempo real para creacion de salas y envio de mensajes usando Socket.io.
 
 servers:
   development:
     host: localhost:3000
     protocol: wss
-    description: Servidor de desarrollo local.
+    description: Servidor de desarrollo local para pruebas internas.
 
 channels:
   root:
     address: /
+    description: Canal principal de comunicacion por defecto de Socket.io.
     messages:
-      # Eventos que el Servidor RECIEVE (Enviados por el client)
-      createRoom:
+      createRoomMsg:
         $ref: '#/components/messages/CreateRoom'
-      joinRoom:
-        $ref: '#/components/messages/JoinRoom'
-      sendMessage:
-        $ref: '#/components/messages/SendMessage'
-      
-      # Eventos que el Servidor SEND (Recibidos por el client)
-      roomCreated:
+      roomCreatedMsg:
         $ref: '#/components/messages/RoomCreated'
-      roomJoined:
+      joinRoomMsg:
+        $ref: '#/components/messages/JoinRoom'
+      roomJoinedMsg:
         $ref: '#/components/messages/RoomJoined'
-      receiveMessage:
+      sendMessageMsg:
+        $ref: '#/components/messages/SendMessage'
+      receiveMessageMsg:
         $ref: '#/components/messages/ReceiveMessage'
 
 operations:
-  # Definimos que puede hacer el cliente
+  # ACCIONES DEL CLIENTE (SEND)
   sendCreateRoom:
     action: send
+    summary: Solicitar creacion de sala.
+    description: El cliente pide al servidor generar una nueva sala y obtener un codigo unico de acceso.
     channel: 
       $ref: '#/channels/root'
     messages:
-      - $ref: '#/components/messages/CreateRoom'
+      - $ref: '#/channels/root/messages/createRoomMsg'
   
-  receiveMessageUpdate:
+  sendJoinRoom:
+    action: send
+    summary: Unirse a sala existente.
+    description: El cliente envia un codigo para intentar entrar en una sala creada previamente por otro usuario.
+    channel: 
+      $ref: '#/channels/root'
+    messages:
+      - $ref: '#/channels/root/messages/joinRoomMsg'
+
+  sendChatMessage:
+    action: send
+    summary: Enviar un mensaje de chat.
+    description: Publica un mensaje de texto dirigido a todos los miembros de la sala actual.
+    channel: 
+      $ref: '#/channels/root'
+    messages:
+      - $ref: '#/channels/root/messages/sendMessageMsg'
+
+  # ACCIONES DEL CLIENTE (RECEIVE)
+  listenRoomCreated:
     action: receive
+    summary: Recibir codigo de nueva sala.
+    description: Evento disparado por el servidor confirmando que la sala se creo con exito.
     channel:
       $ref: '#/channels/root'
     messages:
-      - $ref: '#/components/messages/ReceiveMessage'
+      - $ref: '#/channels/root/messages/roomCreatedMsg'
+
+  listenRoomJoined:
+    action: receive
+    summary: Resultado de la union a sala.
+    description: Informa al cliente si pudo unirse con exito o si hubo un error (ej. sala no existe).
+    channel:
+      $ref: '#/channels/root'
+    messages:
+      - $ref: '#/channels/root/messages/roomJoinedMsg'
+
+  listenMessages:
+    action: receive
+    summary: Recibir mensajes entrantes.
+    description: Escucha los mensajes enviados por otros participantes de la sala en tiempo real.
+    channel:
+      $ref: '#/channels/root'
+    messages:
+      - $ref: '#/channels/root/messages/receiveMessageMsg'
 
 components:
   messages:
     CreateRoom:
       name: create_room
-      summary: Solicita la creación de una nueva sala.
+      summary: Peticion de creacion.
       payload:
         type: object
-        properties: {} # No requiere datos adicionales
+        additionalProperties: false
 
     RoomCreated:
       name: room_created
-      summary: Devuelve el codigo de la sala creada.
+      summary: Entrega el codigo de sala.
       payload:
         type: string
-        description: Codigo de 4 caracteres de la sala.
+        description: Codigo alfanumerico de 4 caracteres (ej. "XD67").
 
     JoinRoom:
       name: join_room
-      summary: Usuario intenta unirse a una sala existente.
+      summary: Intento de acceso.
       payload:
         type: string
-        description: El codigo de la sala a la que desea entrar.
+        description: Codigo de la sala a la que el usuario desea conectarse.
 
     RoomJoined:
       name: room_joined
-      summary: Resultado del intento de union.
+      summary: Confirmacion de acceso.
       payload:
         type: object
         properties:
           success:
             type: boolean
+            description: Indica si el usuario fue aceptado en la sala.
           roomCode:
             type: string
+            description: El codigo confirmado de la sala.
           message:
             type: string
+            description: Mensaje de error en caso de que success sea false.
 
     SendMessage:
       name: send_message
-      summary: Envía un mensaje a la sala.
+      summary: Estructura del mensaje saliente.
       payload:
         $ref: '#/components/schemas/ChatMessage'
 
     ReceiveMessage:
       name: receive_message
-      summary: Retransmite el mensaje a todos los miembros.
+      summary: Estructura del mensaje entrante.
       payload:
         $ref: '#/components/schemas/ChatMessage'
 
   schemas:
     ChatMessage:
       type: object
+      description: Objeto que contiene la información del mensaje y su autor.
       properties:
         room:
           type: string
+          description: Codigo de la sala donde se envia el mensaje.
         author:
           type: string
+          description: Nombre mostrado del usuario que envia el mensaje.
         message:
           type: string
+          description: Contenido textual del mensaje.
         time:
           type: string
           format: date-time
+          description: Marca de tiempo en formato ISO 8601.
