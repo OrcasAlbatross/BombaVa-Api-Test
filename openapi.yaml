@@ -1,0 +1,39 @@
+openapi: 3.1.0
+info:
+  title: REST API BombaVA API TEST
+  version: 1.0.0
+  description: |
+    API REST
+    Proporciona un endpoint de prueba.
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desarrollo local
+
+paths:
+  /status:
+    get:
+      summary: Verificar estado del servidor
+      description: Retorna la hora actual.
+      responses:
+        '200':
+          description: El servidor esta operativo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "online"
+                    description: Estado actual del servidor.
+                  serverTime:
+                    type: string
+                    format: date-time
+                    description: Fecha y hora del servidor en formato ISO 8601.
+                  version:
+                    type: string
+                    example: "1.0.0"
+                    description: Version actual del backend.
+        '500':
+          description: Error interno del servidor.

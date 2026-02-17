@@ -2,9 +2,19 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import fs from 'fs';
+import yaml from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
+
+//RestAPI documetacion
+const swaggerDocument = yaml.load('../openapi.yaml')
+
 
 const app = express();
 app.use(cors());
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const server = http.createServer(app);
 
@@ -65,6 +75,7 @@ io.on('connection', (socket) => {
 const PORT = 3000;
 server.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Documentacion Swagger disponible en http://localhost:${PORT}/api-docs`);
 });
 
 // Endpoint REST para verificar que el servidor esta activo
