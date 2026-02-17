@@ -1,0 +1,109 @@
+asyncapi: 3.0.0
+info:
+  title: API Test
+  version: 1.0.0
+  description: Prueba de API en tiempo real para creacion de salas y envio de mensajes usando Socket.io.
+
+servers:
+  development:
+    host: localhost:3000
+    protocol: wss
+    description: Servidor de desarrollo local.
+
+channels:
+  root:
+    address: /
+    messages:
+      # Eventos que el Servidor RECIEVE (Enviados por el client)
+      createRoom:
+        $ref: '#/components/messages/CreateRoom'
+      joinRoom:
+        $ref: '#/components/messages/JoinRoom'
+      sendMessage:
+        $ref: '#/components/messages/SendMessage'
+      
+      # Eventos que el Servidor SEND (Recibidos por el client)
+      roomCreated:
+        $ref: '#/components/messages/RoomCreated'
+      roomJoined:
+        $ref: '#/components/messages/RoomJoined'
+      receiveMessage:
+        $ref: '#/components/messages/ReceiveMessage'
+
+operations:
+  # Definimos que puede hacer el cliente
+  sendCreateRoom:
+    action: send
+    channel: 
+      $ref: '#/channels/root'
+    messages:
+      - $ref: '#/components/messages/CreateRoom'
+  
+  receiveMessageUpdate:
+    action: receive
+    channel:
+      $ref: '#/channels/root'
+    messages:
+      - $ref: '#/components/messages/ReceiveMessage'
+
+components:
+  messages:
+    CreateRoom:
+      name: create_room
+      summary: Solicita la creación de una nueva sala.
+      payload:
+        type: object
+        properties: {} # No requiere datos adicionales
+
+    RoomCreated:
+      name: room_created
+      summary: Devuelve el codigo de la sala creada.
+      payload:
+        type: string
+        description: Codigo de 4 caracteres de la sala.
+
+    JoinRoom:
+      name: join_room
+      summary: Usuario intenta unirse a una sala existente.
+      payload:
+        type: string
+        description: El codigo de la sala a la que desea entrar.
+
+    RoomJoined:
+      name: room_joined
+      summary: Resultado del intento de union.
+      payload:
+        type: object
+        properties:
+          success:
+            type: boolean
+          roomCode:
+            type: string
+          message:
+            type: string
+
+    SendMessage:
+      name: send_message
+      summary: Envía un mensaje a la sala.
+      payload:
+        $ref: '#/components/schemas/ChatMessage'
+
+    ReceiveMessage:
+      name: receive_message
+      summary: Retransmite el mensaje a todos los miembros.
+      payload:
+        $ref: '#/components/schemas/ChatMessage'
+
+  schemas:
+    ChatMessage:
+      type: object
+      properties:
+        room:
+          type: string
+        author:
+          type: string
+        message:
+          type: string
+        time:
+          type: string
+          format: date-time
