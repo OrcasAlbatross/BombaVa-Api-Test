@@ -1,42 +1,166 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+/* App.css */
+
+/* Config General */
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --bg-color: #f0f2f5;
+  --chat-bg: #ffffff;
+  --text-dark: #333;
+  --text-light: #fff;
+  --border-color: #ddd;
+  --my-message: #dcf8c6;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.App {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.joinChatContainer {
+  display: flex;
+  flex-direction: column;
+  background: white;
   padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 300px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.joinChatContainer h3 {
+  margin-bottom: 1.5rem;
+  color: var(--text-dark);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.joinChatContainer input {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  outline: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.joinChatContainer button {
+  padding: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
 }
 
-.card {
-  padding: 2em;
+.joinChatContainer button:hover {
+  background-color: var(--secondary-color);
 }
 
-.read-the-docs {
-  color: #888;
+.joinChatContainer hr {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+.chat-window {
+  width: 400px;
+  height: 500px;
+  background: var(--chat-bg);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.chat-header {
+  background: #2c3e50;
+  padding: 15px;
+  color: white;
+  font-weight: bold;
+}
+
+.chat-header p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #e5ddd5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Burbuja */
+.message {
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 80%;
+  width: fit-content;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  word-wrap: break-word;
+}
+
+.message strong {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.chat-footer {
+  display: flex;
+  border-top: 1px solid var(--border-color);
+  padding: 10px;
+  background: #f0f0f0;
+}
+
+.chat-footer input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  outline: none;
+  padding-left: 15px;
+}
+
+.chat-footer button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.chat-footer button:hover {
+  transform: scale(1.1);
+  color: var(--secondary-color);
+}
+
+.chat-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 10px;
 }
